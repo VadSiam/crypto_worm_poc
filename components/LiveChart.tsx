@@ -19,6 +19,9 @@ import ReconnectingWebSocket from 'reconnecting-websocket';
 import ReferenceLinesGrid from './ReferenceLinesGrid';
 import { getOpenOrders, makeOrder } from '../utils/endpoints';
 import styled from 'styled-components';
+import { CustomHead } from './CustomHead';
+import SimpleSelect from './Select';
+import { AnimalHead, heads } from '../utils/data';
 
 const StyledResponsiveContainer = styled(ResponsiveContainer)`
   svg {
@@ -40,17 +43,15 @@ const TICKS_STEP = 2 // in points
 const ONE_GRID_VALUE = 40 // USDT
 
 const LiveChart: React.FC = () => {
+  const [activeHead, setHead] = useState<string>(heads[0].id);
   const [data, setData] = useState<ChartData[]>([]);
-  console.log('🚀 ~ file: LiveChart.tsx:42 ~ data:', data)
   const [domain, setDomain] = useState<number[]>([]);
   const [ticks, setTicks] = useState<number[]>([]);
   const [orders, setOrders] = useState<number[]>([]);
-  console.log('🚀 ~ file: LiveChart.tsx:43 ~ orders:', orders)
 
   useEffect(() => {
     const fetch = async () => {
       const resp = await getOpenOrders()
-      console.log('🚀 ~ file: LiveChart.tsx:46 ~ resp:', resp)
       const ordersFromMarket = resp.map(o => roundToNearestEvenInteger(o.price))
       setOrders(ordersFromMarket)
     };
@@ -157,404 +158,74 @@ const LiveChart: React.FC = () => {
 
   const lastDataPoint = data[data.length - 1];
 
-  const CustomImageLabel = (props) => {
-    const { viewBox } = props;
-    return (
-      <g transform={`translate(${viewBox.x},${viewBox.y})`}>
-        <image
-          x={-30}
-          y={-32}
-          width="80"
-          height="80"
-          xlinkHref="/images/head/dragon.png"
-        />
-      </g>
-    );
-  };
-
   return (
     <div style={{ width: '900px', height: '800px' }}>
       Open orders: {orders.length}
       <br />
       <br />
-      <div style={{ width: '100%', height: '100%' }}>
-        <StyledResponsiveContainer width="100%" height="100%">
-          <ComposedChart data={data}>
-            <XAxis dataKey="timestamp" />
-            <YAxis
-              domain={domain}
-            // domain={['auto', 'auto']}
-            />
+      <SimpleSelect
+        defaultHead={activeHead}
+        setHead={setHead}
+      />
+      <br />
+      <br />
+      {heads.map(head => (
+        (activeHead === head.id) && (
+          <div
+            key={head.id}
+            style={{ width: '100%', height: '100%' }}
+          >
+            <StyledResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={data}>
+                <XAxis dataKey="timestamp" />
+                <YAxis
+                  domain={domain}
+                // domain={['auto', 'auto']}
+                />
 
-            {/* <Tooltip /> */}
-            <Legend />
-            <ReferenceLinesGrid
-              ticks={ticks}
-              orders={orders}
-              clickOn={clickOnLine}
-            />
-            <Line
-              type="monotone"
-              dataKey="priceAvg"
-              stroke="#b169bb"
-              strokeWidth={30}
-            />
-            {lastDataPoint && (
-              <ReferenceDot
-                x={lastDataPoint.timestamp}
-                y={lastDataPoint.priceAvg}
-              >
-                <Label content={<CustomImageLabel />} />
-              </ReferenceDot>
-            )}
-            <CartesianGrid
-              strokeDasharray="3 3"
-              vertical={false}
-              horizontalCoordinatesGenerator={(props) => {
-                const gridStep = (TRADE_DIAPASON / 2) / Y_UP_AND_DOWN_DIAPASON
-                const { height } = props;
-                const upLine = Math.floor(height / 2 * (1 + gridStep))
-                const downLine = Math.floor(height / 2 * (1 - gridStep))
-                return height ? [upLine, downLine] : []
-              }}
-            />
+                <Legend />
+                <ReferenceLinesGrid
+                  ticks={ticks}
+                  orders={orders}
+                  clickOn={clickOnLine}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="priceAvg"
+                  stroke={head.bodyColor}
+                  strokeWidth={30}
+                />
+                {lastDataPoint && (
+                  <ReferenceDot
+                    x={lastDataPoint.timestamp}
+                    y={lastDataPoint.priceAvg}
+                  >
+                    <Label content={<CustomHead
+                      imgHead={head.img}
+                      x={head.positionX}
+                      y={head.positionY}
+                    />} />
+                  </ReferenceDot>
+                )}
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                  horizontalCoordinatesGenerator={(props) => {
+                    const gridStep = (TRADE_DIAPASON / 2) / Y_UP_AND_DOWN_DIAPASON
+                    const { height } = props;
+                    const upLine = Math.floor(height / 2 * (1 + gridStep))
+                    const downLine = Math.floor(height / 2 * (1 - gridStep))
+                    return height ? [upLine, downLine] : []
+                  }}
+                />
 
-          </ComposedChart>
-        </StyledResponsiveContainer>
-      </div>
+              </ComposedChart>
+            </StyledResponsiveContainer>
+          </div>
+        )
+      ))}
     </div>
   );
 };
 
 export default LiveChart;
-
-const Data = [
-  {
-    "timestamp": "6:05:08 PM",
-    "priceAvg": 25967.775,
-    "domain": [
-      25915,
-      26020
-    ]
-  },
-  {
-    "timestamp": "6:05:09 PM",
-    "priceAvg": 25967.775,
-    "domain": [
-      25915,
-      26020
-    ]
-  },
-  {
-    "timestamp": "6:05:10 PM",
-    "priceAvg": 25967.775,
-    "domain": [
-      25915,
-      26020
-    ]
-  },
-  {
-    "timestamp": "6:05:11 PM",
-    "priceAvg": 25967.775,
-    "domain": [
-      25915,
-      26020
-    ]
-  },
-  {
-    "timestamp": "6:05:12 PM",
-    "priceAvg": 25967.775,
-    "domain": [
-      25915,
-      26020
-    ]
-  },
-  {
-    "timestamp": "6:05:13 PM",
-    "priceAvg": 25967.775,
-    "domain": [
-      25915,
-      26020
-    ]
-  },
-  {
-    "timestamp": "6:05:14 PM",
-    "priceAvg": 25967.775,
-    "domain": [
-      25915,
-      26020
-    ]
-  },
-  {
-    "timestamp": "6:05:15 PM",
-    "priceAvg": 25967.775,
-    "domain": [
-      25915,
-      26020
-    ]
-  },
-  {
-    "timestamp": "6:05:16 PM",
-    "priceAvg": 25967.775,
-    "domain": [
-      25915,
-      26020
-    ]
-  },
-  {
-    "timestamp": "6:05:17 PM",
-    "priceAvg": 25967.775,
-    "domain": [
-      25915,
-      26020
-    ]
-  },
-  {
-    "timestamp": "6:05:18 PM",
-    "priceAvg": 25967.775,
-    "domain": [
-      25915,
-      26020
-    ]
-  },
-  {
-    "timestamp": "6:05:19 PM",
-    "priceAvg": 25968.72,
-    "domain": [
-      25916,
-      26021
-    ]
-  },
-  {
-    "timestamp": "6:05:20 PM",
-    "priceAvg": 25969.665,
-    "domain": [
-      25917,
-      26022
-    ]
-  },
-  {
-    "timestamp": "6:05:21 PM",
-    "priceAvg": 25969.665,
-    "domain": [
-      25917,
-      26022
-    ]
-  },
-  {
-    "timestamp": "6:05:22 PM",
-    "priceAvg": 25969.665,
-    "domain": [
-      25917,
-      26022
-    ]
-  },
-  {
-    "timestamp": "6:05:23 PM",
-    "priceAvg": 25969.665,
-    "domain": [
-      25917,
-      26022
-    ]
-  },
-  {
-    "timestamp": "6:05:24 PM",
-    "priceAvg": 25969.665,
-    "domain": [
-      25917,
-      26022
-    ]
-  },
-  {
-    "timestamp": "6:05:25 PM",
-    "priceAvg": 25969.665,
-    "domain": [
-      25917,
-      26022
-    ]
-  },
-  {
-    "timestamp": "6:05:26 PM",
-    "priceAvg": 25967.405,
-    "domain": [
-      25915,
-      26020
-    ]
-  },
-  {
-    "timestamp": "6:05:27 PM",
-    "priceAvg": 25965.145,
-    "domain": [
-      25913,
-      26018
-    ]
-  },
-  {
-    "timestamp": "6:05:28 PM",
-    "priceAvg": 25965.145,
-    "domain": [
-      25913,
-      26018
-    ]
-  },
-  {
-    "timestamp": "6:05:29 PM",
-    "priceAvg": 25962.555,
-    "domain": [
-      25910,
-      26015
-    ]
-  },
-  {
-    "timestamp": "6:05:30 PM",
-    "priceAvg": 25959.965,
-    "domain": [
-      25908,
-      26012
-    ]
-  },
-  {
-    "timestamp": "6:05:31 PM",
-    "priceAvg": 25959.965,
-    "domain": [
-      25908,
-      26012
-    ]
-  },
-  {
-    "timestamp": "6:05:32 PM",
-    "priceAvg": 25959.965,
-    "domain": [
-      25908,
-      26012
-    ]
-  },
-  {
-    "timestamp": "6:05:33 PM",
-    "priceAvg": 25959.965,
-    "domain": [
-      25908,
-      26012
-    ]
-  },
-  {
-    "timestamp": "6:05:34 PM",
-    "priceAvg": 25959.965,
-    "domain": [
-      25908,
-      26012
-    ]
-  },
-  {
-    "timestamp": "6:05:35 PM",
-    "priceAvg": 25959.965,
-    "domain": [
-      25908,
-      26012
-    ]
-  },
-  {
-    "timestamp": "6:05:36 PM",
-    "priceAvg": 25959.965,
-    "domain": [
-      25908,
-      26012
-    ]
-  },
-  {
-    "timestamp": "6:05:37 PM",
-    "priceAvg": 25959.965,
-    "domain": [
-      25908,
-      26012
-    ]
-  },
-  {
-    "timestamp": "6:06:30 PM",
-    "priceAvg": 25956.835,
-    "domain": [
-      25904,
-      26009
-    ]
-  },
-  {
-    "timestamp": "6:06:31 PM",
-    "priceAvg": 25956.785,
-    "domain": [
-      25904,
-      26009
-    ]
-  },
-  {
-    "timestamp": "6:06:32 PM",
-    "priceAvg": 25956.785,
-    "domain": [
-      25904,
-      26009
-    ]
-  },
-  {
-    "timestamp": "6:06:33 PM",
-    "priceAvg": 25956.785,
-    "domain": [
-      25904,
-      26009
-    ]
-  },
-  {
-    "timestamp": "6:06:34 PM",
-    "priceAvg": 25955.894999999997,
-    "domain": [
-      25903,
-      26008
-    ]
-  },
-  {
-    "timestamp": "6:06:35 PM",
-    "priceAvg": 25955.004999999997,
-    "domain": [
-      25903,
-      26007
-    ]
-  },
-  {
-    "timestamp": "6:06:36 PM",
-    "priceAvg": 25955.004999999997,
-    "domain": [
-      25903,
-      26007
-    ]
-  },
-  {
-    "timestamp": "6:06:37 PM",
-    "priceAvg": 25955.004999999997,
-    "domain": [
-      25903,
-      26007
-    ]
-  },
-  {
-    "timestamp": "6:06:38 PM",
-    "priceAvg": 25955.625,
-    "domain": [
-      25903,
-      26008
-    ]
-  },
-  {
-    "timestamp": "6:06:39 PM",
-    "priceAvg": 25955.004999999997,
-    "domain": [
-      25903,
-      26007
-    ]
-  },
-  {
-    "timestamp": "6:06:40 PM",
-    "priceAvg": 25955.004999999997,
-    "domain": [
-      25903,
-      26007
-    ]
-  }
-]
