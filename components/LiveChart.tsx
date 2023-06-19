@@ -18,17 +18,17 @@ import { generateTicksTrade, roundToNearestEvenInteger, weightedAverage } from '
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import ReferenceLinesGrid from './ReferenceLinesGrid';
 import { getOpenOrders, makeOrder } from '../utils/endpoints';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import { CustomHead } from './CustomHead';
 import SimpleSelect from './Select';
 import { AnimalHead, heads } from '../utils/data';
+import AnimatedBack from './AnimatedBack';
 
 const StyledResponsiveContainer = styled(ResponsiveContainer)`
   svg {
     width: 110% !important;
   }
 `;
-
 
 interface ChartData {
   timestamp: string;
@@ -171,12 +171,18 @@ const LiveChart: React.FC = () => {
       <br />
       {heads.map(head => (
         (activeHead === head.id) && (
-          <div
+          <AnimatedBack
             key={head.id}
-            style={{ width: '100%', height: '100%' }}
+            style={{
+              width: '100%',
+              height: '100%',
+            }}
           >
-            <StyledResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={data}>
+            <StyledResponsiveContainer
+              width="100%"
+              height="100%"
+            >
+              <ComposedChart data={data} style={{ marginLeft: '-94px' }}>
                 <XAxis dataKey="timestamp" />
                 <YAxis
                   domain={domain}
@@ -221,7 +227,7 @@ const LiveChart: React.FC = () => {
 
               </ComposedChart>
             </StyledResponsiveContainer>
-          </div>
+          </AnimatedBack>
         )
       ))}
     </div>

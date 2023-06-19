@@ -25,8 +25,9 @@ const ReferenceLinesGrid = ({ ticks, clickOn, orders, ...props }: IReferenceLine
             {...props}
             id={`${tick}`}
             key={tick}
-            strokeWidth={10}
+            strokeWidth={6}
             y={tick}
+            fill="#19f39980"
             stroke={inOrder
               ? 'blue'
               : onFocus === tick ? "#99f39980" : "#f8cece"}
