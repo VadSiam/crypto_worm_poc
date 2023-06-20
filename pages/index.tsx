@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import LiveChart from '../components/LiveChart';
 import AnomalyChart from '../components/TestChart';
+import LineD3Chart from '../components/D3Chart';
 
 const Home: React.FC = () => {
   return (
@@ -16,8 +17,9 @@ const Home: React.FC = () => {
       <main>
         <h1>(DEMO!)Live Crypto Chart: BTC-USDT</h1>
 
-        <LiveChart />
+        {/* <LiveChart /> */}
         {/* <AnomalyChart /> */}
+        <LineD3Chart />
       </main>
     </div >
   );
