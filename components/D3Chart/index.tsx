@@ -3,6 +3,8 @@ import * as d3 from 'd3';
 import styled from 'styled-components';
 import AnimatedBack from '../AnimatedBack';
 import { generateTicksTrade } from '../../utils/helpers';
+import SimpleSelect from '../Select';
+import { heads } from '../../utils/data';
 
 const Y_UP_AND_DOWN_DIAPASON = 0.002 // 0.2%
 const TRADE_DIAPASON = 0.002 // 0.2%
@@ -27,12 +29,14 @@ interface DataPoint {
 }
 
 const LineD3Chart: React.FC = () => {
+  const [activeHead, setHead] = useState<string>(heads[0].id);
   const ref = useRef<SVGSVGElement>(null);
   const [data, setData] = useState<DataPoint[]>([]);
   const [lines, setLines] = useState([])
   const [ticks, setTicks] = useState<number[]>([]);
   const [orders, setOrders] = useState<string[]>([]);
   // console.log('🚀 ~ file: index.tsx:35 ~ orders:', orders, lines)
+  const animal = heads.find(h => h.id === activeHead)
 
 
   useEffect(() => {
@@ -71,7 +75,7 @@ const LineD3Chart: React.FC = () => {
       svgInject.append('image')
         .attr('href', '/images/bricks/mushPattern.svg')
         .attr('x', findLine?.x)
-        .attr('y', findLine?.y - 64) // TODO can't get where this diff -64 is coming
+        .attr('y', findLine?.y - 164) // TODO can't get where this diff -164 is coming
         .attr('width', width)
       // .attr('height', 200);
     });
@@ -187,13 +191,13 @@ const LineD3Chart: React.FC = () => {
       g.append('path')
         .datum(data)
         .attr('fill', 'none')
-        .attr('stroke', 'steelblue')
+        .attr('stroke', animal.bodyColor)
         .attr('stroke-width', 40)
         .attr('d', line);
 
       // HEAD. Append an image element to the SVG
       g.append('image')
-        .attr('xlink:href', '/images/head/worm.png') // The URL of the image
+        .attr('xlink:href', animal.img) // The URL of the image
         .attr('x', xScale(new Date(data[data.length - 1].timestamp)) - 35) // Position the image
         .attr('y', yScale(data[data.length - 1].priceAvg) - 60) // Position the image
         .attr('width', 100) // The width of the image
@@ -204,7 +208,14 @@ const LineD3Chart: React.FC = () => {
 
   return (
     <div style={{ width: width + 100, height: height + 100 }}>
-      <AnimatedBack>
+      <h3>Choose your animal</h3>
+      <SimpleSelect
+        defaultHead={activeHead}
+        setHead={setHead}
+      />
+      <br />
+      <br />
+      <AnimatedBack image={animal.backgroundImg}>
         <StyledSvg
           ref={ref}
           width={width + margin.left + margin.right + 100}
