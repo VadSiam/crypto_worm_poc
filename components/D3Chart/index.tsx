@@ -24,7 +24,7 @@ export interface DataPoint {
 
 const LineD3Chart: React.FC = () => {
   const [activeHead, setHead] = useState<string>(heads[0].id);
-  const [activePair, setPair] = useState<string>(cryptoPairs[1].value);
+  const [activePair, setPair] = useState<string>(cryptoPairs[0].value);
   const ref = useRef<SVGSVGElement>(null);
   const [data, setData] = useState<DataPoint[]>([]);
   const [lines, setLines] = useState([])
@@ -66,9 +66,9 @@ const LineD3Chart: React.FC = () => {
       const findLine = lines.find(l => l.id === order);
 
       svgInject.append('image')
-        .attr('href', '/images/bricks/mushPattern.svg')
+        .attr('href', animal.patternLine)
         .attr('x', findLine?.x)
-        .attr('y', findLine?.y - 164) // TODO can't get where this diff -164 is coming
+        .attr('y', findLine?.y - 190) // TODO can't get where this diff -164 is coming
         .attr('width', widthChart)
     });
   }, [orders, lines])
