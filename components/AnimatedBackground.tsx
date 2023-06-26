@@ -13,7 +13,7 @@ const moveBackground = keyframes`
   }
 `;
 
-const AnimatedBack = styled.div<AnimatedBackProps>`
+const AnimatedBackground = styled.div<AnimatedBackProps>`
   width: 100%;
   height: 100vh;
   background-image: url(${props => props.image ?? 'https://cdn.discordapp.com/attachments/1092399713757708378/1120287817164148816/vad_siam_clouds_and_trees_cartoon_style_101da6cf-e17a-4c69-8e10-36f0f71fdf84.png'});
@@ -23,4 +23,4 @@ const AnimatedBack = styled.div<AnimatedBackProps>`
   animation: ${moveBackground} 20s linear infinite;
 `;
 
-export default AnimatedBack;
+export default AnimatedBackground;

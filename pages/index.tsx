@@ -15,8 +15,6 @@ const Home: React.FC = () => {
       </Head>
 
       <main>
-        <h1>(DEMO!)Live Crypto Chart: BTC-USDT</h1>
-
         {/* <LiveChart /> */}
         {/* <AnomalyChart /> */}
         <LineD3Chart />

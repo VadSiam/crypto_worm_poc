@@ -1,12 +1,12 @@
 import React, { Dispatch, SetStateAction, useState } from 'react';
-import { AnimalHead, heads } from './../utils/data';
+import { AnimalHead, heads } from '../utils/data';
 
 interface ISelect {
   defaultHead: string,
   setHead: Dispatch<SetStateAction<string>>
 }
 
-const SimpleSelect: React.FC<ISelect> = ({
+const AnimalSelect: React.FC<ISelect> = ({
   defaultHead,
   setHead,
 }) => {
@@ -28,4 +28,4 @@ const SimpleSelect: React.FC<ISelect> = ({
   );
 }
 
-export default SimpleSelect;
+export default AnimalSelect;

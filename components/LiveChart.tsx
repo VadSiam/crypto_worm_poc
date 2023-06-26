@@ -20,9 +20,9 @@ import ReferenceLinesGrid from './ReferenceLinesGrid';
 import { getOpenOrders, makeOrder } from '../utils/endpoints';
 import styled, { keyframes } from 'styled-components';
 import { CustomHead } from './CustomHead';
-import SimpleSelect from './Select';
+import AnimalSelect from './AnimalSelect';
 import { AnimalHead, heads } from '../utils/data';
-import AnimatedBack from './AnimatedBack';
+import AnimatedBackground from './AnimatedBackground';
 
 const StyledResponsiveContainer = styled(ResponsiveContainer)`
   svg {
@@ -163,7 +163,7 @@ const LiveChart: React.FC = () => {
       Open orders: {orders.length}
       <br />
       <br />
-      <SimpleSelect
+      <AnimalSelect
         defaultHead={activeHead}
         setHead={setHead}
       />
@@ -171,7 +171,7 @@ const LiveChart: React.FC = () => {
       <br />
       {heads.map(head => (
         (activeHead === head.id) && (
-          <AnimatedBack
+          <AnimatedBackground
             key={head.id}
             style={{
               width: '100%',
@@ -227,7 +227,7 @@ const LiveChart: React.FC = () => {
 
               </ComposedChart>
             </StyledResponsiveContainer>
-          </AnimatedBack>
+          </AnimatedBackground>
         )
       ))}
     </div>
