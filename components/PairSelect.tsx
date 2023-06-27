@@ -19,7 +19,7 @@ const PairSelect: React.FC<ISelect> = ({
   };
 
   return (
-    <select value={value} onChange={handleChange}>
+    <select value={value} onChange={handleChange} disabled >
       {cryptoPairs.map(cp => (
         <option key={cp.value} value={cp.value}>{cp.label}</option>
       ))}
