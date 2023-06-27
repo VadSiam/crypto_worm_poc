@@ -1,4 +1,3 @@
-import { FormControl, MenuItem, Select } from '@mui/material';
 import React, { Dispatch, SetStateAction, useState } from 'react';
 import { cryptoPairs } from '../utils/data';
 
@@ -20,13 +19,11 @@ const PairSelect: React.FC<ISelect> = ({
   };
 
   return (
-    <FormControl size="small">
-      <Select value={value} onChange={handleChange} disabled>
-        {cryptoPairs.map(cp => (
-          <MenuItem key={cp.value} value={cp.value}>{cp.label}</MenuItem>
-        ))}
-      </Select>
-    </FormControl>
+    <select value={value} onChange={handleChange} disabled >
+      {cryptoPairs.map(cp => (
+        <option key={cp.value} value={cp.value}>{cp.label}</option>
+      ))}
+    </select>
   );
 }
 
