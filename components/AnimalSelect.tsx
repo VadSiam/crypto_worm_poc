@@ -1,5 +1,6 @@
+import { FormControl, MenuItem, Select } from '@mui/material';
 import React, { Dispatch, SetStateAction, useState } from 'react';
-import { AnimalHead, heads } from '../utils/data';
+import { heads } from '../utils/data';
 
 interface ISelect {
   defaultHead: string,
@@ -10,7 +11,6 @@ const AnimalSelect: React.FC<ISelect> = ({
   defaultHead,
   setHead,
 }) => {
-  const [worm, dragon, frog] = heads;
   const [value, setValue] = useState(defaultHead);
 
   const handleChange = (event) => {
@@ -20,11 +20,13 @@ const AnimalSelect: React.FC<ISelect> = ({
   };
 
   return (
-    <select value={value} onChange={handleChange}>
-      <option value={worm.id}>{worm.id}</option>
-      <option value={dragon.id}>{dragon.id}</option>
-      <option value={frog.id}>{frog.id}</option>
-    </select>
+    <FormControl size="small">
+      <Select value={value} onChange={handleChange}>
+        {heads.map((head) => (
+          <MenuItem key={head.id} value={head.id}>{head.id}</MenuItem>
+        ))}
+      </Select>
+    </FormControl>
   );
 }
 

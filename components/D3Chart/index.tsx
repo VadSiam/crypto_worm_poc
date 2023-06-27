@@ -59,6 +59,11 @@ const LineD3Chart: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    drawChart({ data, ticks, setTicks, setLines, setOrders, animal, ref });
+  }, [data]);
+
+
+  useEffect(() => {
     // add pattern to orders lines
     const svgInject = d3.select('svg');
     orders.forEach(order => {
@@ -67,22 +72,20 @@ const LineD3Chart: React.FC = () => {
 
       svgInject.append('image')
         .attr('href', animal.patternLine)
-        .attr('x', findLine?.x)
-        .attr('y', findLine?.y - 190) // TODO can't get where this diff -164 is coming
+        .attr('x', marginChart.left)
+        .attr('y', findLine?.y - 194) // TODO can't get where this diff -194 is coming. Size of screen has effect, height of injected image (if exist)
         .attr('width', widthChart)
+        // .attr('height', 140)
     });
   }, [orders, lines])
 
-
-  useEffect(() => {
-    drawChart({data, ticks, setTicks, setLines, setOrders, animal, ref});
-  }, [data]);
 
   return (
     <div style={{
       width: widthChart + 100,
       height: heightChart + 100,
       textAlign: 'center',
+      margin: 'auto',
     }}>
       <h1>Live Crypto Chart: BTC-USDT</h1>
       <SelectContainer>

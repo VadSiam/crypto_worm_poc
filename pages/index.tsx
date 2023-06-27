@@ -1,7 +1,6 @@
 import Head from 'next/head';
-import LiveChart from '../components/LiveChart';
-import AnomalyChart from '../components/TestChart';
 import LineD3Chart from '../components/D3Chart';
+import { Container } from '@mui/material';
 
 const Home: React.FC = () => {
   return (
@@ -14,11 +13,9 @@ const Home: React.FC = () => {
         <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png" />
       </Head>
 
-      <main>
-        {/* <LiveChart /> */}
-        {/* <AnomalyChart /> */}
+      <Container maxWidth="lg">
         <LineD3Chart />
-      </main>
+      </Container>
     </div >
   );
 };
