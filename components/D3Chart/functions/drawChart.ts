@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 import { DataPoint } from "..";
-import { generateTicksTrade } from '../../../utils/helpers';
-import { TICKS_STEP_INTERVAL, TICKS_TRADE, heightChart, marginChart, widthChart } from '../../../utils/data';
+import { generateTicksTrade, roundToNearestEvenInteger } from '../../../utils/helpers';
+import { TICKS_STEP_INTERVAL, TICKS_TRADE, TRADE_DIAPASON, heightChart, marginChart, widthChart } from '../../../utils/data';
 
 interface IDrawChart {
   data: DataPoint[],
@@ -89,22 +89,29 @@ export const drawChart = ({
         d3.select(this).attr('stroke', 'green')
           .attr('stroke-opacity', 1)
         // Handle mouse enter event
-        console.log(`Mouse entered on line with id: ${d3.select(this).attr('id')}`);
+        // console.log(`Mouse entered on line with id: ${d3.select(this).attr('id')}`);
       })
       .on('mouseleave', function (event, d) {
         d3.select(this).attr('stroke', 'pink')
           .attr('stroke-opacity', 0.3);
         // Handle mouse leave event
-        console.log(`Mouse left on line with id: ${d3.select(this).attr('id')}`);
+        // console.log(`Mouse left on line with id: ${d3.select(this).attr('id')}`);
       })
       .on('click', function (event, d) {
         const clickedId = d3.select(this).attr('id');
+        let pairOrder = '';
+        if (+clickedId >= latestPriceAvg) { // if it's ask order, making bid order
+          const bidOrder = roundToNearestEvenInteger(+clickedId * (1 - TRADE_DIAPASON))
+          pairOrder = `${bidOrder}`;
+        } else { // it's bid order, making ask order
+          const askOrder = roundToNearestEvenInteger(+clickedId * (1 + TRADE_DIAPASON))
+          pairOrder = `${askOrder}`;
+        }
         const rect = (this as SVGGraphicsElement).getBoundingClientRect();
-        console.log('🚀 ~ file: index.tsx:159 ~ this:', this, rect)
         setOrders(state => {
           const isNew = !state.includes(clickedId)
 
-          return isNew ? [...state, clickedId] : state;
+          return isNew ? [...state, clickedId, pairOrder] : state;
         })
         // Handle click event
       });

@@ -34,7 +34,8 @@ const LineD3Chart: React.FC = () => {
 
 
   useEffect(() => {
-    const ws = new WebSocket(`wss://stream.binance.com:9443/ws/${activePair}@depth`);
+    // const ws = new WebSocket(`wss://stream.binance.com:9443/ws/${activePair}@depth`);
+    const ws = new WebSocket(`wss://testnet.binance.vision/ws/${activePair}@depth`); // test net
 
     ws.onmessage = (message) => {
       const response = JSON.parse(message.data);
