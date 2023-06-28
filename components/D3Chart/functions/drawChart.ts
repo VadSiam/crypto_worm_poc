@@ -1,16 +1,17 @@
 import * as d3 from 'd3';
 import { DataPoint } from "..";
 import { generateTicksTrade, roundToNearestEvenInteger } from '../../../utils/helpers';
-import { TICKS_STEP_INTERVAL, TICKS_TRADE, TRADE_DIAPASON, heightChart, marginChart, widthChart } from '../../../utils/data';
+import { AnimalHead, TICKS_STEP_INTERVAL, TICKS_STEP_INTERVAL_ETH, TICKS_TRADE, TICKS_TRADE_ETH, TRADE_DIAPASON, heightChart, marginChart, widthChart } from '../../../utils/data';
 
 interface IDrawChart {
-  data: DataPoint[],
+  data: DataPoint[][],
   ticks: number[],
   setTicks: React.Dispatch<React.SetStateAction<number[]>>,
   setLines: React.Dispatch<React.SetStateAction<any[]>>,
   setOrders: React.Dispatch<React.SetStateAction<string[]>>,
-  animal: any,
+  animal: AnimalHead,
   ref: React.RefObject<SVGSVGElement>
+  activePair: string
 }
 
 export const drawChart = ({
@@ -21,8 +22,13 @@ export const drawChart = ({
   setOrders,
   animal,
   ref,
+  activePair,
 }: IDrawChart) => {
-  if (data.length && ref.current) {
+  const [dataBTC, dataETH, dataMIX] = data;
+  const activeData = activePair === 'btcusdt'
+    ? dataBTC
+    : activePair === 'ethusdt' ? dataETH : dataMIX;
+  if (activeData.length && ref.current) {
     const svg = d3.select(ref.current);
     svg.selectAll("*").remove(); // Clear the SVG to prevent duplicate elements
 
@@ -35,11 +41,11 @@ export const drawChart = ({
       .x(d => xScale(new Date(d.timestamp)))
       .y(d => yScale(d.priceAvg));
 
-    xScale.domain(d3.extent(data, d => new Date(d.timestamp)));
+    xScale.domain(d3.extent(activeData, d => new Date(d.timestamp)));
 
     // Adjust the yScale domain based on the latest data point
-    const latestPriceAvg = data[data.length - 1].priceAvg;
-    yScale.domain([latestPriceAvg - TICKS_TRADE / 2, latestPriceAvg + TICKS_TRADE / 2]); // Adjust the range as needed
+    const latestPriceAvg = activeData[activeData.length - 1].priceAvg;
+    yScale.domain([latestPriceAvg - (activePair === 'btcusdt' ? TICKS_TRADE : TICKS_TRADE_ETH) / 2, latestPriceAvg + (activePair === 'btcusdt' ? TICKS_TRADE : TICKS_TRADE_ETH) / 2]); // Adjust the range as needed
 
     // xAxis at bottom
     g.append('g')
@@ -51,8 +57,8 @@ export const drawChart = ({
     const tickValues = ticks
     setTicks(state => {
       const [newArrayTicks, fullArrayTicks] = generateTicksTrade({
-        ticks: TICKS_TRADE,
-        step: TICKS_STEP_INTERVAL,
+        ticks: (activePair === 'btcusdt' ? TICKS_TRADE : TICKS_TRADE_ETH),
+        step: (activePair === 'btcusdt' ? TICKS_STEP_INTERVAL : TICKS_STEP_INTERVAL_ETH),
         priceAvg: latestPriceAvg,
         existedTicks: state,
       })
@@ -67,7 +73,7 @@ export const drawChart = ({
       );
 
     g.append('g')
-      .call(d3.axisLeft(yScale).ticks(10)); // Add ticks to the Y-axis
+      .call(d3.axisLeft(yScale).ticks(activePair === 'btcusdt' ? 10 : 1)); // Add ticks to the Y-axis
 
 
     // Select the tick lines
@@ -134,7 +140,7 @@ export const drawChart = ({
 
     // Body
     g.append('path')
-      .datum(data)
+      .datum(activeData)
       .attr('fill', 'none')
       .attr('stroke', animal.bodyColor)
       .attr('stroke-width', 40)
@@ -143,8 +149,8 @@ export const drawChart = ({
     // HEAD. Append an image element to the SVG
     g.append('image')
       .attr('xlink:href', animal.img) // The URL of the image
-      .attr('x', xScale(new Date(data[data.length - 1].timestamp)) - 35) // Position the image
-      .attr('y', yScale(data[data.length - 1].priceAvg) - 60) // Position the image
+      .attr('x', xScale(new Date(activeData[activeData.length - 1].timestamp)) - 35) // Position the image
+      .attr('y', yScale(activeData[activeData.length - 1].priceAvg) - 60) // Position the image
       .attr('width', 100) // The width of the image
       .attr('height', 100); // The height of the image
 

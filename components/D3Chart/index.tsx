@@ -26,7 +26,9 @@ const LineD3Chart: React.FC = () => {
   const [activeHead, setHead] = useState<string>(heads[0].id);
   const [activePair, setPair] = useState<string>(cryptoPairs[0].value);
   const ref = useRef<SVGSVGElement>(null);
-  const [data, setData] = useState<DataPoint[]>([]);
+  const [dataBTC, setBTCData] = useState<DataPoint[]>([]);
+  const [dataETH, setETHData] = useState<DataPoint[]>([]);
+  const [dataMIX, setMIXData] = useState<DataPoint[]>([]);
   const [lines, setLines] = useState([])
   const [ticks, setTicks] = useState<number[]>([]);
   const [orders, setOrders] = useState<string[]>([]);
@@ -34,12 +36,13 @@ const LineD3Chart: React.FC = () => {
 
 
   useEffect(() => {
-    // const ws = new WebSocket(`wss://stream.binance.com:9443/ws/${activePair}@depth`);
-    const ws = new WebSocket(`wss://testnet.binance.vision/ws/${activePair}@depth`); // test net
+    const streams = 'btcusdt@depth/ethusdt@depth';
+    // const ws = new WebSocket(`wss://stream.binance.com:9443/stream?streams=${streams}`);
+    const ws = new WebSocket(`wss://testnet.binance.vision/stream?streams=${streams}`); // test net
 
     ws.onmessage = (message) => {
       const response = JSON.parse(message.data);
-      const { a, b, E } = response;
+      const { stream, data: { a, b, E } } = response;
       const [ask1 = [], bid1 = []] = [a[0], b[0]];
       const timestamp = new Date(E);
       const priceAsk1 = parseFloat(ask1[0]);
@@ -48,10 +51,28 @@ const LineD3Chart: React.FC = () => {
         ? (priceAsk1 + priceBid1) / 2
         : (priceAsk1 || priceBid1);
 
-      setData(prevData => [
-        ...prevData.slice(-40),
-        { timestamp, priceAvg },
-      ]);
+      if (stream === 'btcusdt@depth') {
+        setBTCData(prevData => [
+          ...prevData.slice(-40),
+          { timestamp, priceAvg },
+        ]);
+        let lastDataETH = 0;
+        setETHData(state => {
+          lastDataETH = state[state.length - 1]?.priceAvg;
+          if (!!lastDataETH) {
+            setMIXData(prevData => [
+              ...prevData.slice(-40),
+              { timestamp, priceAvg: priceAvg / lastDataETH },
+            ]);
+          }
+          return state;
+        })
+      } else if (stream === 'ethusdt@depth') {
+        setETHData(prevData => [
+          ...prevData.slice(-40),
+          { timestamp, priceAvg },
+        ]);
+      }
     };
 
     return () => {
@@ -60,8 +81,8 @@ const LineD3Chart: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    drawChart({ data, ticks, setTicks, setLines, setOrders, animal, ref });
-  }, [data]);
+    drawChart({ data: [dataBTC, dataETH, dataMIX], ticks, setTicks, setLines, setOrders, animal, ref, activePair });
+  }, [dataBTC, dataETH]);
 
 
   useEffect(() => {
@@ -76,7 +97,7 @@ const LineD3Chart: React.FC = () => {
         .attr('x', marginChart.left)
         .attr('y', findLine?.y - 194) // TODO can't get where this diff -194 is coming. Size of screen has effect, height of injected image (if exist)
         .attr('width', widthChart)
-        // .attr('height', 140)
+      // .attr('height', 140)
     });
   }, [orders, lines])
 

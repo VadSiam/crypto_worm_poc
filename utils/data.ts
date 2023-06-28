@@ -16,7 +16,9 @@ export interface CryptoPair {
 export const Y_UP_AND_DOWN_DIAPASON = 0.002 // 0.2%
 export const TRADE_DIAPASON = 0.002 // 0.2%
 export const TICKS_TRADE = 100
+export const TICKS_TRADE_ETH = 10
 export const TICKS_STEP_INTERVAL = 2 // in points
+export const TICKS_STEP_INTERVAL_ETH = 0.1 // in points
 export const ONE_GRID_VALUE = 40 // USDT
 
 export const marginChart = { top: 20, right: 10, bottom: 20, left: 50 };
