@@ -2,6 +2,7 @@ import * as d3 from 'd3';
 import { DataPoint } from "..";
 import { generateTicksTrade, roundToNearestEvenInteger } from '../../../utils/helpers';
 import { AnimalHead, TICKS_STEP_INTERVAL, TICKS_STEP_INTERVAL_ETH, TICKS_TRADE, TICKS_TRADE_ETH, TRADE_DIAPASON, heightChart, marginChart, widthChart } from '../../../utils/data';
+import { getTrend } from './getTrend';
 
 interface IDrawChart {
   data: DataPoint[][],
@@ -146,13 +147,17 @@ export const drawChart = ({
       .attr('stroke-width', 40)
       .attr('d', line);
 
+    const angleRotateHead = getTrend(activeData.slice(-2));
     // HEAD. Append an image element to the SVG
     g.append('image')
       .attr('xlink:href', animal.img) // The URL of the image
       .attr('x', xScale(new Date(activeData[activeData.length - 1].timestamp)) - 35) // Position the image
       .attr('y', yScale(activeData[activeData.length - 1].priceAvg) - 60) // Position the image
       .attr('width', 100) // The width of the image
-      .attr('height', 100); // The height of the image
+      .attr('height', 100) // The height of the image
+      .transition() // Start a transition
+      .duration(100) // 0.1 a second transition
+      .attr('transform', `rotate(${angleRotateHead}, ${xScale(new Date(activeData[activeData.length - 1].timestamp))}, ${yScale(activeData[activeData.length - 1].priceAvg)})`)
 
   }
 };
