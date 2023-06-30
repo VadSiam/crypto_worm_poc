@@ -33,21 +33,21 @@ export const heads: AnimalHead[] = [
     positionY: -42,
     positionX: -20,
     backgroundImg: '/images/background/worm_back.png',
-    patternLine: '/images/bricks/mushPattern.svg',
+    patternLine: '/images/bricks/mushPatternBig.svg',
   },
   {
     id: 'Dragon',
     img: '/images/head/dragon.png',
     bodyColor: '#17638c',
     backgroundImg: '/images/background/dragon_back.png',
-    patternLine: '/images/bricks/chickenPattern.svg',
+    patternLine: '/images/bricks/chickenPatternBig.svg',
   },
   {
     id: 'Frog',
     img: '/images/head/frog.png',
     bodyColor: '#717f2a',
     backgroundImg: '/images/background/frog_back.png',
-    patternLine: '/images/bricks/mosqPattern.svg',
+    patternLine: '/images/bricks/mosqPatternBig.svg',
   },
 ]
 

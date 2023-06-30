@@ -33,6 +33,7 @@ const LineD3Chart: React.FC = () => {
   const [ticks, setTicks] = useState<number[]>([]);
   const [orders, setOrders] = useState<string[]>([]);
   const animal = heads.find(h => h.id === activeHead)
+  const pairLabel = cryptoPairs.find(cp => cp.value === activePair)?.label
 
 
   useEffect(() => {
@@ -109,7 +110,7 @@ const LineD3Chart: React.FC = () => {
       textAlign: 'center',
       margin: 'auto',
     }}>
-      <h1>Live Crypto Chart: BTC-USDT</h1>
+      <h1>Live Crypto Chart: {`${pairLabel}`}</h1>
       <SelectContainer>
         <div>
           <h3>Choose your animal</h3>
