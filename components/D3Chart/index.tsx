@@ -2,11 +2,13 @@ import React, { useRef, useEffect, useState } from 'react';
 import * as d3 from 'd3';
 import styled from 'styled-components';
 import AnimatedBackground from '../AnimatedBackground';
-import { cryptoPairs, heads, heightChart, marginChart, widthChart } from '../../utils/data';
+import { ONE_GRID_VALUE, cryptoPairs, heads, heightChart, marginChart, widthChart } from '../../utils/data';
 import PairSelect from '../PairSelect';
 import { SelectContainer } from './styles';
 import { drawChart } from './functions/drawChart';
 import { AnimalSelectCircle } from '../AnimalSelectCircle';
+import { getBiggerNumberFirst, roundToNearestEvenInteger } from '../../utils/helpers';
+import { getOpenOrders, makeOrder } from '../../utils/endpoints';
 
 
 const StyledSvg = styled.svg`
@@ -22,7 +24,7 @@ export interface DataPoint {
 }
 
 const radius = 60;
-const xCorrection = -26;
+const xCorrection = 2;
 const yCorrection = -22;
 
 const LineD3Chart: React.FC = () => {
@@ -38,6 +40,47 @@ const LineD3Chart: React.FC = () => {
   const animal = heads.find(h => h.id === activeHead)
   const pairLabel = cryptoPairs.find(cp => cp.value === activePair)?.label
 
+  // useEffect(() => {
+  //   const fetch = async () => {
+  //     const resp = await getOpenOrders()
+  //     const ordersFromMarket = resp.map(o => roundToNearestEvenInteger(o.price))
+  //     setOrders(ordersFromMarket)
+  //   };
+
+  //   setInterval(() => {
+  //     fetch()
+  //   }, 2000);
+  // }, [])
+
+  const saveAndSetOrders = async (newOrders: string[]) => {
+    const [clickedId, pairOrder] = newOrders;
+    const isNew = !orders.includes(clickedId)
+    const { priceAvg } = dataBTC.slice(-1)[0];
+    const oneGridInBTC = +(ONE_GRID_VALUE / priceAvg).toFixed(6)
+    if (isNew) {
+      const [askOrder, bidOrder] = getBiggerNumberFirst(+clickedId, +pairOrder);
+
+      const resp = await Promise.all([askOrder, bidOrder].map(async (order, idx) => {
+        return await makeOrder({
+          symbol: 'BTCUSDT',
+          side: !idx ? 'SELL' : 'BUY',
+          type: 'LIMIT',
+          timeInForce: 'GTC',
+          quantity: oneGridInBTC,
+          price: order,
+          recvWindow: 5000,
+        })
+      }))
+
+      if (resp[0] && resp[1]) {
+        // set to memory for future use
+        const data = JSON.parse(sessionStorage.getItem('historyOrders') || '[]');
+        sessionStorage.setItem('historyOrders', JSON.stringify([...data, [askOrder, bidOrder]]));
+        // set to component state
+        setOrders(state => [...state, clickedId, pairOrder])
+      }
+    }
+  }
 
   useEffect(() => {
     const streams = 'btcusdt@depth/ethusdt@depth';
@@ -85,7 +128,7 @@ const LineD3Chart: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    drawChart({ data: [dataBTC, dataETH, dataMIX], ticks, setTicks, setLines, setOrders, animal, ref, activePair });
+    drawChart({ data: [dataBTC, dataETH, dataMIX], ticks, setTicks, setLines, saveAndSetOrders, animal, ref, activePair });
   }, [dataBTC, dataETH]);
 
 
@@ -96,12 +139,14 @@ const LineD3Chart: React.FC = () => {
       // Pattern line
       const findLine = lines.find(l => l.id === order);
 
-      svgInject.append('image')
-        .attr('href', animal.patternLine)
-        .attr('x', marginChart.left)
-        .attr('y', findLine?.y - 194) // TODO can't get where this diff -194 is coming. Size of screen has effect, height of injected image (if exist)
-        .attr('width', widthChart)
-      // .attr('height', 140)
+      if (findLine) {
+        svgInject.append('image')
+          .attr('href', animal.patternLine)
+          .attr('x', marginChart.left)
+          .attr('y', findLine?.y - 224) // TODO can't get where this diff -224 is coming. Size of screen has effect, height of injected image (if exist)
+          .attr('width', widthChart)
+        // .attr('height', 140)
+      }
     });
   }, [orders, lines])
 

@@ -9,7 +9,7 @@ interface IDrawChart {
   ticks: number[],
   setTicks: React.Dispatch<React.SetStateAction<number[]>>,
   setLines: React.Dispatch<React.SetStateAction<any[]>>,
-  setOrders: React.Dispatch<React.SetStateAction<string[]>>,
+  saveAndSetOrders: (newOrders: string[]) => Promise<void>,
   animal: AnimalHead,
   ref: React.RefObject<SVGSVGElement>
   activePair: string
@@ -20,7 +20,7 @@ export const drawChart = ({
   ticks,
   setTicks,
   setLines,
-  setOrders,
+  saveAndSetOrders,
   animal,
   ref,
   activePair,
@@ -115,11 +115,7 @@ export const drawChart = ({
           pairOrder = `${askOrder}`;
         }
         const rect = (this as SVGGraphicsElement).getBoundingClientRect();
-        setOrders(state => {
-          const isNew = !state.includes(clickedId)
-
-          return isNew ? [...state, clickedId, pairOrder] : state;
-        })
+        saveAndSetOrders([clickedId, pairOrder])
         // Handle click event
       });
 

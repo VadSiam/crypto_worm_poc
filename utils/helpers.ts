@@ -1,6 +1,6 @@
 interface IGenerateTicksTrade {
-  ticks: number, 
-  step: number, 
+  ticks: number,
+  step: number,
   priceAvg: number
   existedTicks: number[]
 }
@@ -39,4 +39,17 @@ const weightedAverage = (array: string[][]) => {
   return sumData.sumWeights !== 0 ? sumData.sum / sumData.sumWeights : 0;
 }
 
-export { generateTicksTrade, roundToNearestEvenInteger, weightedAverage }
+const getBiggerNumberFirst = (num1: number, num2: number) => {
+  if (num1 > num2) {
+    return [num1, num2];
+  } else {
+    return [num2, num1];
+  }
+}
+
+export {
+  generateTicksTrade,
+  roundToNearestEvenInteger,
+  weightedAverage,
+  getBiggerNumberFirst,
+}
