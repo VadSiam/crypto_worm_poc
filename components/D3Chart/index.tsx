@@ -2,12 +2,11 @@ import React, { useRef, useEffect, useState } from 'react';
 import * as d3 from 'd3';
 import styled from 'styled-components';
 import AnimatedBackground from '../AnimatedBackground';
-import { generateTicksTrade } from '../../utils/helpers';
-import AnimalSelect from '../AnimalSelect';
 import { cryptoPairs, heads, heightChart, marginChart, widthChart } from '../../utils/data';
 import PairSelect from '../PairSelect';
 import { SelectContainer } from './styles';
 import { drawChart } from './functions/drawChart';
+import { AnimalSelectCircle } from '../AnimalSelectCircle';
 
 
 const StyledSvg = styled.svg`
@@ -21,6 +20,10 @@ export interface DataPoint {
   timestamp: Date;
   priceAvg: number;
 }
+
+const radius = 60;
+const xCorrection = -26;
+const yCorrection = -22;
 
 const LineD3Chart: React.FC = () => {
   const [activeHead, setHead] = useState<string>(heads[0].id);
@@ -114,9 +117,15 @@ const LineD3Chart: React.FC = () => {
       <SelectContainer>
         <div>
           <h3>Choose your animal</h3>
-          <AnimalSelect
-            defaultHead={activeHead}
-            setHead={setHead}
+          <AnimalSelectCircle
+            options={heads}
+            defaultOption={animal}
+            onChange={setHead}
+            circleOptionsStyles={{
+              radius,
+              xCorrection,
+              yCorrection,
+            }}
           />
         </div>
         <div>
