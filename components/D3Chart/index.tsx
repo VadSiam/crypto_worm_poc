@@ -9,6 +9,7 @@ import { drawChart } from './functions/drawChart';
 import { AnimalSelectCircle } from '../AnimalSelectCircle';
 import { getBiggerNumberFirst, roundToNearestEvenInteger } from '../../utils/helpers';
 import { getOpenOrders, makeOrder } from '../../utils/endpoints';
+import { CancelAllOpenOrders } from './CancelAllOrders';
 
 
 const StyledSvg = styled.svg`
@@ -40,17 +41,15 @@ const LineD3Chart: React.FC = () => {
   const animal = heads.find(h => h.id === activeHead)
   const pairLabel = cryptoPairs.find(cp => cp.value === activePair)?.label
 
-  // useEffect(() => {
-  //   const fetch = async () => {
-  //     const resp = await getOpenOrders()
-  //     const ordersFromMarket = resp.map(o => roundToNearestEvenInteger(o.price))
-  //     setOrders(ordersFromMarket)
-  //   };
+  useEffect(() => {
+    const fetch = async () => {
+      const resp = await getOpenOrders()
+      const ordersFromMarket = resp.map(o => roundToNearestEvenInteger(o.price))
+      setOrders(ordersFromMarket)
+    };
 
-  //   setInterval(() => {
-  //     fetch()
-  //   }, 2000);
-  // }, [])
+    fetch()
+  }, [])
 
   const saveAndSetOrders = async (newOrders: string[]) => {
     const [clickedId, pairOrder] = newOrders;
@@ -135,16 +134,17 @@ const LineD3Chart: React.FC = () => {
   useEffect(() => {
     // add pattern to orders lines
     const svgInject = d3.select('svg');
+    console.log('🚀 ~ file: index.tsx:141 ~ lines:', orders)
     orders.forEach(order => {
       // Pattern line
-      const findLine = lines.find(l => l.id === order);
+      const findLine = lines.find(l => l.id === `${order}`);
 
       if (findLine) {
         svgInject.append('image')
           .attr('href', animal.patternLine)
           .attr('x', marginChart.left)
           .attr('y', findLine?.y - 224) // TODO can't get where this diff -224 is coming. Size of screen has effect, height of injected image (if exist)
-          .attr('width', widthChart)
+          .attr('width', widthChart + 110)
         // .attr('height', 140)
       }
     });
@@ -153,7 +153,7 @@ const LineD3Chart: React.FC = () => {
 
   return (
     <div style={{
-      width: widthChart + 100,
+      width: widthChart + 300,
       height: heightChart + 100,
       textAlign: 'center',
       margin: 'auto',
@@ -180,10 +180,15 @@ const LineD3Chart: React.FC = () => {
             setPair={setPair}
           />
         </div>
+        <div>
+          <h3>Cancel</h3>
+          <CancelAllOpenOrders />
+        </div>
       </SelectContainer>
       <AnimatedBackground image={animal.backgroundImg}>
         <StyledSvg
           ref={ref}
+          // width={widthChart - marginChart.left - marginChart.right }
           width={widthChart + marginChart.left + marginChart.right + 100}
           height={heightChart + marginChart.top + marginChart.bottom}
         />

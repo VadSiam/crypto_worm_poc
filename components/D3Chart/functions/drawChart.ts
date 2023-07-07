@@ -69,7 +69,7 @@ export const drawChart = ({
     const yAxis = g.append('g')
       .call(d3.axisLeft(yScale)
         .tickValues(tickValues)
-        .tickSize(-widthChart)
+        .tickSize(-widthChart * 1.4)
         .tickFormat(() => '')
       );
 

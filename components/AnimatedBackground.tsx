@@ -20,6 +20,7 @@ const AnimatedBackground = styled.div<AnimatedBackProps>`
   background-repeat: repeat-x;
   background-size: 100% 92%; 
   animation: ${moveBackground} 20s linear infinite;
+  text-align: left;
 `;
 
 export default AnimatedBackground;
