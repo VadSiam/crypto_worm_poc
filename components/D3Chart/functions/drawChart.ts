@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 import { DataPoint } from "..";
-import { generateTicksTrade, roundToNearestEvenInteger } from '../../../utils/helpers';
+import { IVolume, generateTicksTrade, getLimitedValue, roundToNearestEvenInteger } from '../../../utils/helpers';
 import { AnimalHead, TICKS_STEP_INTERVAL, TICKS_STEP_INTERVAL_ETH, TICKS_TRADE, TICKS_TRADE_ETH, TRADE_DIAPASON, heightChart, marginChart, widthChart } from '../../../utils/data';
 import { getTrend } from './getTrend';
 
@@ -13,6 +13,7 @@ interface IDrawChart {
   animal: AnimalHead,
   ref: React.RefObject<SVGSVGElement>
   activePair: string
+  volumes: IVolume[]
 }
 
 export const drawChart = ({
@@ -24,6 +25,7 @@ export const drawChart = ({
   animal,
   ref,
   activePair,
+  volumes,
 }: IDrawChart) => {
   const [dataBTC, dataETH, dataMIX] = data;
   const activeData = activePair === 'btcusdt'
@@ -77,12 +79,39 @@ export const drawChart = ({
       .call(d3.axisLeft(yScale).ticks(activePair === 'btcusdt' ? 10 : 1)); // Add ticks to the Y-axis
 
 
-    // Select the tick lines
-    const tickLines = yAxis.selectAll('.tick line')
-      .attr('stroke-width', 10)
-      .attr('stroke', 'pink')
-      .attr('stroke-opacity', 0.3);
+    // Create the tick lines
+    const tickLines = yAxis.selectAll('.tick line');
+    tickLines.each(function (d, i) {
+      const currentId = tickValues[i];
+      const gradientId = `${currentId}`;
 
+
+      const volumeForId = volumes.find(v => Object.keys(v)?.[0] === gradientId)
+
+      // Define the gradient
+      const gradient = svg.append("defs")
+        .append("linearGradient")
+        .attr("id", `d${gradientId}`)
+        .attr("gradientUnits", "userSpaceOnUse");
+      const numberOffset = getLimitedValue(volumeForId); 
+
+      gradient.append("stop")
+        .attr("offset", `${numberOffset * 50}%`) 
+        .attr("stop-color", 'blue')
+        .attr("stop-opacity", 1);
+
+      gradient.append("stop")
+        // .attr("offset", `${(1 - numberOffset) * 50}%`)
+        .attr("stop-color", 'pink')
+        .attr("stop-opacity", 1);
+
+      // Apply the gradient
+      d3.select(this)
+        .attr('stroke-width', 10)
+        .attr('stroke', `url(#d${gradientId})`)
+        .attr('stroke-opacity', 0.3)
+    });
+      
 
     // Assign the id attribute to each line
     tickLines.attr('id', function (d, i) {

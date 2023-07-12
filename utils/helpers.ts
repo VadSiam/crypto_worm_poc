@@ -47,9 +47,33 @@ const getBiggerNumberFirst = (num1: number, num2: number) => {
   }
 }
 
+export interface IVolume {
+  [key: string]: number
+}
+const convertArrayToObject = (arr: string[][]): IVolume[] => {
+  return arr.reduce((result, subArr) => {
+    const key = Math.round(+subArr[0] / 2) * 2; // Round the first number to the nearest even number
+    const value = parseFloat(subArr[1]);
+    const obj = {};
+    obj[key] = value;
+    result.push(obj);
+    return result;
+  }, [{}]);
+}
+
+const getLimitedValue = (obj?: IVolume) => {
+  // Retrieve the first value from the object
+  const value = obj && Object.values(obj)?.[0];
+
+  // Return the value or 1 if the value is greater than 1
+  return value > 1 ? 1 : value;
+}
+
 export {
   generateTicksTrade,
   roundToNearestEvenInteger,
   weightedAverage,
   getBiggerNumberFirst,
+  convertArrayToObject,
+  getLimitedValue,
 }

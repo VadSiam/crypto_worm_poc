@@ -7,7 +7,7 @@ import PairSelect from '../PairSelect';
 import { SelectContainer } from './styles';
 import { drawChart } from './functions/drawChart';
 import { AnimalSelectCircle } from '../AnimalSelectCircle';
-import { getBiggerNumberFirst, roundToNearestEvenInteger } from '../../utils/helpers';
+import { IVolume, convertArrayToObject, getBiggerNumberFirst, roundToNearestEvenInteger } from '../../utils/helpers';
 import { getOpenOrders, makeOrder } from '../../utils/endpoints';
 import { CancelAllOpenOrders } from './CancelAllOrders';
 
@@ -29,6 +29,7 @@ const xCorrection = 2;
 const yCorrection = -22;
 
 const LineD3Chart: React.FC = () => {
+  const [volumes, setVolumes] = useState<IVolume[]>([]);
   const [activeHead, setHead] = useState<string>(heads[0].id);
   const [activePair, setPair] = useState<string>(cryptoPairs[0].value);
   const ref = useRef<SVGSVGElement>(null);
@@ -83,8 +84,8 @@ const LineD3Chart: React.FC = () => {
 
   useEffect(() => {
     const streams = 'btcusdt@depth/ethusdt@depth';
-    // const ws = new WebSocket(`wss://stream.binance.com:9443/stream?streams=${streams}`);
-    const ws = new WebSocket(`wss://testnet.binance.vision/stream?streams=${streams}`); // test net
+    const ws = new WebSocket(`wss://stream.binance.com:9443/stream?streams=${streams}`);
+    // const ws = new WebSocket(`wss://testnet.binance.vision/stream?streams=${streams}`); // test net
 
     ws.onmessage = (message) => {
       const response = JSON.parse(message.data);
@@ -96,6 +97,20 @@ const LineD3Chart: React.FC = () => {
       const priceAvg = (priceAsk1 && priceBid1)
         ? (priceAsk1 + priceBid1) / 2
         : (priceAsk1 || priceBid1);
+
+      setVolumes(state => {
+        const newVolumes = convertArrayToObject([...a, ...b]);
+        // create a merged object from state and newVolumes
+        const mergedVolumes = state.reduce((acc, curr) => ({ ...acc, ...curr }), {});
+        // overwrite any existing properties in mergedVolumes with ones from newVolumes
+        newVolumes.forEach(vol => {
+          const key = Object.keys(vol)[0];
+          mergedVolumes[key] = vol[key];
+        });
+        // convert back to array of objects
+        const result = Object.keys(mergedVolumes).map(key => ({ [key]: mergedVolumes[key] }));
+        return result;
+      })
 
       if (stream === 'btcusdt@depth') {
         setBTCData(prevData => [
@@ -127,7 +142,7 @@ const LineD3Chart: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    drawChart({ data: [dataBTC, dataETH, dataMIX], ticks, setTicks, setLines, saveAndSetOrders, animal, ref, activePair });
+    drawChart({ data: [dataBTC, dataETH, dataMIX], ticks, setTicks, setLines, saveAndSetOrders, animal, ref, activePair, volumes });
   }, [dataBTC, dataETH]);
 
 
