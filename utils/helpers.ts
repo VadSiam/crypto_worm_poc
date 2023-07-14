@@ -63,7 +63,7 @@ const convertArrayToObject = (arr: string[][]): IVolume[] => {
 
 const getLimitedValue = (obj?: IVolume) => {
   // Retrieve the first value from the object
-  const value = obj && Object.values(obj)?.[0];
+  const value = (obj && Object.values(obj)?.[0]) ?? 0;
 
   // Return the value or 1 if the value is greater than 1
   return value > 1 ? 1 : value;

@@ -1,14 +1,15 @@
 import { Button } from "@mui/material"
-import { cancelAllOpenOrdersOneByOne } from "../../utils/endpoints"
+import { cancelAllOpenOrders } from "../../utils/endpoints"
 
 const CancelAllOpenOrders = () => {
   const onCancelAllOrders = async () => {
-    await cancelAllOpenOrdersOneByOne('BTCUSDT')
+    await cancelAllOpenOrders('BTCUSDT')
+    // await cancelAllOpenOrdersOneByOne('BTCUSDT')
   }
 
   return (
     <Button
-    onClick={onCancelAllOrders}
+      onClick={onCancelAllOrders}
     >Cancel All Open Orders
     </Button>
   )

@@ -45,7 +45,7 @@ const LineD3Chart: React.FC = () => {
   useEffect(() => {
     const fetch = async () => {
       const resp = await getOpenOrders()
-      const ordersFromMarket = resp.map(o => roundToNearestEvenInteger(o.price))
+      const ordersFromMarket = resp?.map(o => roundToNearestEvenInteger(o.price))
       setOrders(ordersFromMarket)
     };
 
@@ -56,7 +56,7 @@ const LineD3Chart: React.FC = () => {
     const [clickedId, pairOrder] = newOrders;
     const isNew = !orders.includes(clickedId)
     const { priceAvg } = dataBTC.slice(-1)[0];
-    const oneGridInBTC = +(ONE_GRID_VALUE / priceAvg).toFixed(6)
+    const oneGridInBTC = +(ONE_GRID_VALUE / priceAvg).toFixed(5)
     if (isNew) {
       const [askOrder, bidOrder] = getBiggerNumberFirst(+clickedId, +pairOrder);
 
@@ -71,6 +71,7 @@ const LineD3Chart: React.FC = () => {
           recvWindow: 5000,
         })
       }))
+      console.log('🚀 ~ file: index.tsx:74 ~ resp:', resp)
 
       if (resp[0] && resp[1]) {
         // set to memory for future use
@@ -149,8 +150,7 @@ const LineD3Chart: React.FC = () => {
   useEffect(() => {
     // add pattern to orders lines
     const svgInject = d3.select('svg');
-    console.log('🚀 ~ file: index.tsx:141 ~ lines:', orders)
-    orders.forEach(order => {
+    orders?.forEach(order => {
       // Pattern line
       const findLine = lines.find(l => l.id === `${order}`);
 

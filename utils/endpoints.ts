@@ -1,33 +1,3 @@
-const getOpenOrders = async () => {
-  try {
-    const res = await fetch('/api/binance', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        method: 'GET', // or 'POST'
-        endpoint: 'openOrders', // endpoint in the Binance API
-        params: {
-          symbol: 'BTCUSDT', // Replace with your symbol
-          recvWindow: 5000
-        }, // parameters for the request
-      }),
-    });
-
-    if (res.ok) {
-      const json = await res.json();
-      return json;
-    } else {
-      console.error(`Some error at getOpenOrders: ${res}`)
-      return null
-    }
-  } catch (error) {
-    console.error(`Error at getOpenOrders: ${error}`)
-    return null
-  }
-};
-
 interface IOrder {
   symbol: string,
   side: string,
@@ -38,50 +8,55 @@ interface IOrder {
   recvWindow?: number,
 };
 
-const makeOrder = async (params: IOrder) => {
+const getOpenOrders = async () => {
   try {
-    const res = await fetch('/api/binance', {
+    const res = await fetch('/api/openOrders');
+    if (res.ok) {
+      const json = await res.json();
+      return json;
+    } else {
+      console.error(`Some error at getOpenOrders: ${res.statusText}`);
+      return null;
+    }
+  } catch (error) {
+    console.error(`Error at getOpenOrders: ${error}`);
+    return null;
+  }
+};
+
+const makeOrder = async (order) => {
+  try {
+    const res = await fetch('/api/makeOrder', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        method: 'POST',
-        endpoint: 'newOrder',
-        params: {
-          ...params,
-          timestamp: Date.now(),
-        },
-      }),
+      body: JSON.stringify(order),
     });
 
     if (res.ok) {
       const json = await res.json();
       return json;
     } else {
-      console.error(`Some error at makeOrder: ${JSON.stringify(res)}`)
-      return null
+      console.error(`Some error at makeOrder: ${res.statusText}`);
+      return null;
     }
   } catch (error) {
-    console.error(`Error at makeOrder: ${error}`)
-    return null
+    console.error(`Error at makeOrder: ${error}`);
+    return null;
   }
 };
+
 
 const cancelAllOpenOrders = async (symbol: string) => {
   try {
-    const res = await fetch('/api/binance', {
+    const res = await fetch('/api/cancelOrders', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        method: 'DELETE',
-        endpoint: 'openOrders', // Change to 'openOrders'
-        params: {
-          symbol: symbol,
-          timestamp: Date.now(),
-        },
+        symbol: symbol,
       }),
     });
 
@@ -89,45 +64,14 @@ const cancelAllOpenOrders = async (symbol: string) => {
       const json = await res.json();
       return json;
     } else {
-      console.error(`Some error at cancelAllOpenOrders: ${res.statusText}`)
-      return null
+      console.error(`Some error at cancelAllOpenOrders: ${res.statusText}`);
+      return null;
     }
   } catch (error) {
-    console.error(`Error at cancelAllOpenOrders: ${error}`)
-    return null
-  }
-};
-
-const cancelAllOpenOrdersOneByOne = async (symbol: string) => {
-  try {
-    const res = await fetch('/api/binance', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        method: 'GET_AND_DELETE',  // use 'GET_AND_DELETE'
-        endpoint: 'getOpenOrders', // change to 'getOpenOrders'
-        params: {
-          symbol: symbol,
-          timestamp: Date.now(),
-        },
-      }),
-    });
-
-    if (res.ok) {
-      const json = await res.json();
-      console.log('🚀 ~ file: endpoints.ts:90 ~ json:', json)
-      return json;
-    } else {
-      console.error(`Some error at cancelAllOpenOrders: ${res.statusText}`)
-      return null
-    }
-  } catch (error) {
-    console.error(`Error at cancelAllOpenOrders: ${error}`)
-    return null
+    console.error(`Error at cancelAllOpenOrders: ${error}`);
+    return null;
   }
 };
 
 
-export { getOpenOrders, makeOrder, cancelAllOpenOrders, cancelAllOpenOrdersOneByOne };
+export { getOpenOrders, makeOrder, cancelAllOpenOrders };

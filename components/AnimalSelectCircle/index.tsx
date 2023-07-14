@@ -86,7 +86,8 @@ export const AnimalSelectCircle = ({
             const angle = (index * 360 * Math.PI) / (180 * options.length);
             const x = xCorrection + radius * Math.cos(angle);
             const y = yCorrection + radius * Math.sin(angle);
-
+            console.log('Calculated values:', x, y);
+            
             return (
               <CircularOption
                 key={option.id}
