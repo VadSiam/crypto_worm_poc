@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useMemo } from 'react';
 import * as d3 from 'd3';
 import styled from 'styled-components';
 import AnimatedBackground from '../AnimatedBackground';
@@ -11,6 +11,8 @@ import { getBiggerNumberFirst, roundToNearestEvenInteger } from '../../utils/hel
 import { getOpenOrders, makeOrder } from '../../utils/endpoints';
 import { CancelAllOpenOrders } from './CancelAllOrders';
 import { useWebSocket } from './functions/useWebSocket';
+import PriceComponent from './PriceComponent';
+import OpenOrders from './OpenOrders';
 
 
 const StyledSvg = styled.svg`
@@ -38,6 +40,21 @@ const LineD3Chart: React.FC = () => {
   const [orders, setOrders] = useState<string[]>([]);
   const animal = heads.find(h => h.id === activeHead)
   const pairLabel = cryptoPairs.find(cp => cp.value === activePair)?.label
+  const { volumes, dataBTC, dataETH, dataMIX } = useWebSocket();
+
+  const currentPriceString = useMemo(() => {
+    const { priceAvg } = dataBTC.slice(-1)[0] ?? {};
+    return `${Math.floor(priceAvg) ?? 0}`;
+  }, [dataBTC])
+
+  const openOrders = useMemo(() => {
+    const { priceAvg } = dataBTC.slice(-1)[0] ?? {};
+    const preparedOrders = orders.map(order => ({
+      price: order, 
+      side: +order > +priceAvg ? 'SELL' : 'BUY'
+    }))
+    return preparedOrders;
+  }, [orders, dataBTC])
 
   useEffect(() => {
     const intervalFunction = setInterval(async () => {
@@ -74,17 +91,15 @@ const LineD3Chart: React.FC = () => {
       }))
       console.log('🚀 ~ file: index.tsx:74 ~ resp:', resp)
 
-      if (resp[0] && resp[1]) {
-        // set to memory for future use
-        const data = JSON.parse(sessionStorage.getItem('historyOrders') || '[]');
-        sessionStorage.setItem('historyOrders', JSON.stringify([...data, [askOrder, bidOrder]]));
-        // set to component state
-        setOrders(state => [...state, clickedId, pairOrder])
-      }
+      // if (resp[0] && resp[1]) {
+      //   // set to memory for future use
+      //   const data = JSON.parse(sessionStorage.getItem('historyOrders') || '[]');
+      //   sessionStorage.setItem('historyOrders', JSON.stringify([...data, [askOrder, bidOrder]]));
+      //   // set to component state
+      //   setOrders(state => [...state, clickedId, pairOrder])
+      // }
     }
   }
-
-  const { volumes, dataBTC, dataETH, dataMIX } = useWebSocket();
 
   useEffect(() => {
     drawChart({ data: [dataBTC, dataETH, dataMIX], ticks, setTicks, setLines, saveAndSetOrders, animal, ref, activePair, volumes });
@@ -132,15 +147,25 @@ const LineD3Chart: React.FC = () => {
           />
         </div>
         <div>
+          <h3>Your open orders</h3>
+          <OpenOrders
+            openOrders={openOrders}
+          />
+        </div>
+        {/* <div>
           <h3>Choose your crypto pair</h3>
           <PairSelect
             defaultPair={activePair}
             setPair={setPair}
           />
-        </div>
+        </div> */}
         <div>
           <h3>Cancel</h3>
           <CancelAllOpenOrders setOrders={setOrders} />
+        </div>
+        <div>
+          <h3>Current Price</h3>
+          <PriceComponent text={currentPriceString} />
         </div>
       </SelectContainer>
       <AnimatedBackground image={animal.backgroundImg}>

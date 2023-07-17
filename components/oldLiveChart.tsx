@@ -20,7 +20,7 @@ import ReferenceLinesGrid from './ReferenceLinesGrid';
 import { getOpenOrders, makeOrder } from '../utils/endpoints';
 import styled, { keyframes } from 'styled-components';
 import { CustomHead } from './CustomHead';
-import AnimalSelect from './AnimalSelect';
+import AnimalSelect from './oldAnimalSelect';
 import { AnimalHead, heads } from '../utils/data';
 import AnimatedBackground from './AnimatedBackground';
 

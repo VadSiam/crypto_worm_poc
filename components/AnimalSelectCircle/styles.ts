@@ -2,8 +2,8 @@ import styled from "styled-components";
 
 const CircularSelectWrapper = styled.div`
   position: relative;
-  width: 100px;
-  height: 100px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;

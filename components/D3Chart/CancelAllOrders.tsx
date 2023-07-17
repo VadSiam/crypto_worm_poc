@@ -19,6 +19,7 @@ const CancelAllOpenOrders = ({
 
   return (
     <Button
+      variant="outlined"
       onClick={onCancelAllOrders}
     >Cancel All Open Orders
     </Button>
