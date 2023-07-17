@@ -1,10 +1,20 @@
 import { Button } from "@mui/material"
 import { cancelAllOpenOrders } from "../../utils/endpoints"
 
-const CancelAllOpenOrders = () => {
+interface ICancelAllOpenOrders {
+  setOrders: React.Dispatch<React.SetStateAction<string[]>>
+}
+
+const CancelAllOpenOrders = ({
+  setOrders,
+}: ICancelAllOpenOrders) => {
   const onCancelAllOrders = async () => {
-    await cancelAllOpenOrders('BTCUSDT')
-    // await cancelAllOpenOrdersOneByOne('BTCUSDT')
+    try {
+      await cancelAllOpenOrders('BTCUSDT')
+      setOrders([])
+    } catch (error) {
+      console.error('Error in cancelAllOpenOrders:', error)
+    }
   }
 
   return (
