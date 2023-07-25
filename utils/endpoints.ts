@@ -11,7 +11,6 @@ interface IOrder {
 const getOpenOrders = async () => {
   try {
     const res = await fetch('/api/openOrders');
-    console.log('🚀 ~ file: endpoints.ts:14 ~ res:', res)
     if (res.ok) {
       const json = await res.json();
       return json;
