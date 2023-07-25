@@ -1,8 +1,9 @@
 import { Spot } from '@binance/connector';
 
 export default async function handler(req, res) {
+  console.log(`Base URL1111`);
+  console.log(`Base URL: ${process.env.NEXT_BASE_URL}`);
   try {
-    console.log(`Base URL: ${process.env.NEXT_BASE_URL}`);
     const apiKey = process.env.NEXT_PUBLIC_API_KEY;
     const apiSecret = process.env.NEXT_PUBLIC_API_SECRET;
     const client = new Spot(apiKey, apiSecret, { baseURL: process.env.NEXT_BASE_URL });
