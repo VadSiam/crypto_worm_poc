@@ -13,6 +13,7 @@ import { CancelAllOpenOrders } from './CancelAllOrders';
 import { useWebSocket } from './functions/useWebSocket';
 import PriceComponent from './PriceComponent';
 import OpenOrders from './OpenOrders';
+import NumberSelector from './NumberSelector';
 
 
 const StyledSvg = styled.svg`
@@ -32,6 +33,7 @@ const xCorrection = 2;
 const yCorrection = -22;
 
 const LineD3Chart: React.FC = () => {
+  const [adjustNumber, numberChange] = useState<number>(174);
   const [activeHead, setHead] = useState<string>(heads[0].id);
   const [activePair, setPair] = useState<string>(cryptoPairs[0].value);
   const ref = useRef<SVGSVGElement>(null);
@@ -49,7 +51,7 @@ const LineD3Chart: React.FC = () => {
 
   const openOrders = useMemo(() => {
     const { priceAvg } = dataBTC.slice(-1)[0] ?? {};
-    const preparedOrders = orders.map(order => ({
+    const preparedOrders = orders?.map(order => ({
       price: order, 
       side: +order > +priceAvg ? 'SELL' : 'BUY'
     }))
@@ -72,7 +74,7 @@ const LineD3Chart: React.FC = () => {
 
   const saveAndSetOrders = async (newOrders: string[]) => {
     const [clickedId, pairOrder] = newOrders;
-    const isNew = !orders.includes(clickedId)
+    const isNew = !orders?.includes(clickedId)
     const { priceAvg } = dataBTC.slice(-1)[0];
     const oneGridInBTC = +(ONE_GRID_VALUE / priceAvg).toFixed(5)
     if (isNew) {
@@ -117,7 +119,7 @@ const LineD3Chart: React.FC = () => {
         svgInject.append('image')
           .attr('href', animal.patternLine)
           .attr('x', marginChart.left)
-          .attr('y', findLine?.y - 234) // TODO can't get where this diff -234 is coming. Size of screen has effect, height of injected image (if exist)
+          .attr('y', findLine?.y - adjustNumber) // TODO can't get where this diff 'adjustNumber' is coming. Size of screen has effect, height of injected image (if exist)
           .attr('width', widthChart + 110)
       }
     });
@@ -166,6 +168,10 @@ const LineD3Chart: React.FC = () => {
         <div>
           <h3>Current Price</h3>
           <PriceComponent text={currentPriceString} />
+        </div>
+        <div>
+          <h3>Adjust number</h3>
+          <NumberSelector numberChange={numberChange} adjustNumber={adjustNumber} />
         </div>
       </SelectContainer>
       <AnimatedBackground image={animal.backgroundImg}>

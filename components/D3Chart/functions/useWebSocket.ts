@@ -9,7 +9,10 @@ export const useWebSocket = () => {
 
   useEffect(() => {
     const streams = 'btcusdt@depth/ethusdt@depth';
-    const ws = new WebSocket(`wss://stream.binance.com:9443/stream?streams=${streams}`);
+    // const ws = new WebSocket(`wss://stream.binance.com:9443/stream?streams=${streams}`);
+    const ws = new WebSocket(`wss://testnet.binance.vision/stream?streams=${streams}`);
+    // 'wss://testnet.binance.vision/ws/btcusdt@depth' // test net
+
 
     ws.onmessage = (message) => {
       const response = JSON.parse(message.data);

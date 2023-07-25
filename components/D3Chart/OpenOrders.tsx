@@ -36,7 +36,7 @@ const OpenOrders: React.FC<IOpenOrders> = ({
       onMouseEnter={() => setShowOrders(true)}
       onMouseLeave={() => setShowOrders(false)}
     >
-      <StarsDisplay ordersCount={openOrders.length} totalStars={6} />
+      <StarsDisplay ordersCount={openOrders?.length} totalStars={6} />
 
       {showOrders && !!openOrders.length && (
         <TableContainer component={Paper}>
