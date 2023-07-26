@@ -2,6 +2,7 @@ import { Spot } from '@binance/connector';
 
 export default async function handler(req, res) {
   try {
+    console.log('🚀 ~ file: openOrders.js:8 ~ process.env.NEXT_PUBLIC_BASE_URL:', process.env.NEXT_PUBLIC_BASE_URL)
     const apiKey = process.env.NEXT_PUBLIC_API_KEY;
     const apiSecret = process.env.NEXT_PUBLIC_API_SECRET;
     const client = new Spot(apiKey, apiSecret, { baseURL: process.env.NEXT_PUBLIC_BASE_URL });
