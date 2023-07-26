@@ -10,9 +10,7 @@ interface IOrder {
 
 const getOpenOrders = async () => {
   try {
-    console.log('🚀 ', process.env.NEXT_PUBLIC_BASE_URL)
     const res = await fetch('/api/openOrders');
-    console.log('🚀 ~ file: endpoints.ts:14 ~ res:', res)
     if (res.ok) {
       const json = await res.json();
       return json;
